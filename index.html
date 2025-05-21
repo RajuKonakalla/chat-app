@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Royal Chat - Real-Time Chat Application</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <h1>Royal Chat</h1>
+            <input type="text" id="username-input" placeholder="Enter your username" maxlength="20" />
+            <button id="login-btn">Join Chat</button>
+            <p id="login-error" class="error-message"></p>
+        </div>
+    </div>
+
+    <div id="room-selection-screen" class="screen">
+        <div class="room-selection-container">
+            <h2>Welcome, <span id="display-username"></span></h2>
+            <div class="room-list-container">
+                <h3>Available Chat Rooms</h3>
+                <ul id="room-list"></ul>
+            </div>
+            <div class="create-room-container">
+                <input type="text" id="new-room-name" placeholder="New room name" maxlength="30" />
+                <button id="create-room-btn">Create Room</button>
+                <p id="room-error" class="error-message"></p>
+            </div>
+            <button id="logout-btn" class="secondary-btn">Logout</button>
+        </div>
+    </div>
+
+    <div id="chat-room-screen" class="screen">
+        <div class="chat-room-container">
+            <header>
+                <h2 id="current-room-name"></h2>
+                <button id="leave-room-btn" class="secondary-btn">Leave Room</button>
+            </header>
+            <div id="messages-container" class="messages-container"></div>
+            <form id="message-form">
+                <textarea id="message-input" placeholder="Type your message here..." rows="2" maxlength="500"></textarea>
+                <button type="submit" id="send-message-btn">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>

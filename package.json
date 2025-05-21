@@ -1,0 +1,17 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "Royal Chat is a modern, real-time chat application built with HTML, CSS, and JavaScript. It features user authentication, chat room creation and joining, real-time messaging using WebSockets, and a royal gold and black themed user interface.",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "ws": "^8.18.2"
+  }
+}
