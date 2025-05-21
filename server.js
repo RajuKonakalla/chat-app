@@ -1,8 +1,55 @@
 const http = require('http');
 const WebSocket = require('ws');
 const url = require('url');
+const fs = require('fs');
+const path = require('path');
 
-const server = http.createServer();
+const server = http.createServer((req, res) => {
+    // Serve static files
+    let filePath = '.' + req.url;
+    if (filePath === './') {
+        filePath = './index.html';
+    }
+
+    const extname = String(path.extname(filePath)).toLowerCase();
+    const mimeTypes = {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+        '.wav': 'audio/wav',
+        '.mp4': 'video/mp4',
+        '.woff': 'application/font-woff',
+        '.ttf': 'application/font-ttf',
+        '.eot': 'application/vnd.ms-fontobject',
+        '.otf': 'application/font-otf',
+        '.wasm': 'application/wasm'
+    };
+
+    const contentType = mimeTypes[extname] || 'application/octet-stream';
+
+    fs.readFile(filePath, (error, content) => {
+        if (error) {
+            if(error.code == 'ENOENT') {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('404 Not Found\n');
+            }
+            else {
+                res.writeHead(500);
+                res.end('Server Error: '+error.code+'\n');
+            }
+        }
+        else {
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(content, 'utf-8');
+        }
+    });
+});
+
 const wss = new WebSocket.Server({ noServer: true });
 
 const rooms = new Map(); // roomName -> Set of clients
@@ -48,7 +95,6 @@ wss.on('connection', (ws, request) => {
                     ws.username = username;
                     users.set(username, ws);
                     ws.send(JSON.stringify({ type: 'login', success: true, username }));
-                    // Send current room list
                     ws.send(JSON.stringify({ type: 'room_list', rooms: Array.from(rooms.keys()) }));
                 }
                 break;
@@ -66,7 +112,6 @@ wss.on('connection', (ws, request) => {
                     }
                     rooms.set(roomName, new Set());
                     ws.send(JSON.stringify({ type: 'create_room', success: true, roomName }));
-                    // Broadcast updated room list to all users
                     wss.clients.forEach(client => {
                         if (client.readyState === WebSocket.OPEN) {
                             client.send(JSON.stringify({ type: 'room_list', rooms: Array.from(rooms.keys()) }));
@@ -82,7 +127,6 @@ wss.on('connection', (ws, request) => {
                         ws.send(JSON.stringify({ type: 'join_room', success: false, message: 'Room does not exist' }));
                         return;
                     }
-                    // Remove from previous room if any
                     if (ws.currentRoom) {
                         const oldRoomClients = rooms.get(ws.currentRoom);
                         if (oldRoomClients) {
@@ -154,7 +198,6 @@ wss.on('connection', (ws, request) => {
     });
 });
 
-// Ping clients to detect dead connections
 const interval = setInterval(() => {
     wss.clients.forEach((ws) => {
         if (ws.isAlive === false) return ws.terminate();
